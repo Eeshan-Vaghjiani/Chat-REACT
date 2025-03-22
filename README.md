@@ -2,8 +2,6 @@
 
 A modern, real-time chat application built with React and Firebase, featuring a sleek blue UI design and seamless user experience.
 
-![SuperChat Banner](https://raw.githubusercontent.com/your-username/superchat/main/screenshots/banner.png)
-
 ## ✨ Features
 
 - **Real-time Messaging**: Instant message delivery powered by Firebase
@@ -14,9 +12,33 @@ A modern, real-time chat application built with React and Firebase, featuring a 
 - **Typing Indicators**: Visual feedback for message sending
 - **Responsive Design**: Works on desktop and mobile devices
 
-## 🚀 Live Demo
+## 🚀 Deployment
 
-Check out the live demo: [SuperChat Live](https://superchat-7c5a6.web.app)
+To deploy this application using GitHub Pages:
+
+1. Update your package.json:
+
+```json
+{
+  "homepage": "https://your-username.github.io/superchat",
+  "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  }
+}
+```
+
+2. Install GitHub Pages dependency:
+
+```bash
+npm install --save-dev gh-pages
+```
+
+3. Deploy to GitHub Pages:
+
+```bash
+npm run deploy
+```
 
 ## 🛠️ Technologies Used
 
@@ -83,16 +105,6 @@ service cloud.firestore {
 }
 ```
 
-## 📱 Screenshots
-
-### Sign-in Page
-
-![Sign-in Page](https://raw.githubusercontent.com/your-username/superchat/main/screenshots/signin.png)
-
-### Chat Interface
-
-![Chat Interface](https://raw.githubusercontent.com/your-username/superchat/main/screenshots/chat.png)
-
 ## 🎨 Features in Detail
 
 ### Real-time Chat
@@ -146,9 +158,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Your Name - [@your_twitter](https://twitter.com/your_twitter)
+Eeshan Vaghjiani - [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white)](https://www.instagram.com/eeshan.04?igsh=MXI0NnBtY3VyeWp5aw%3D%3D&utm_source=qr)
 
-Project Link: [https://github.com/your-username/superchat](https://github.com/your-username/superchat)
+Project Link: [https://github.com/Eeshan-Vaghjiani/Chatt-REACT](https://github.com/Eeshan-Vaghjiani/Chatt-REACT)
 
 ---
 
