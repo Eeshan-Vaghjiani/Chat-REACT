@@ -24,7 +24,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build --message \"Deploy React app to GitHub Pages [skip ci]\"",
+    "deploy": "gh-pages -d build --no-history --dotfiles",
     "clean": "rmdir /s /q build && rmdir /s /q node_modules"
   },
   "eslintConfig": {

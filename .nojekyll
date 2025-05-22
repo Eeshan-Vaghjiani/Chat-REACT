@@ -1,0 +1,19 @@
+````
+(Leave this file empty)
+
+7. **Update index.html**:
+
+````html
+<vscode_codeblock_uri>file:///d%3A/projects/Chatt-REACT/public/index.html</vscode_codeblock_uri><!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>SuperChat</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
