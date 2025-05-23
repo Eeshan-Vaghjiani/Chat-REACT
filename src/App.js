@@ -3,7 +3,7 @@ import './App.css';
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query } from 'firebase/firestore';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, browserLocalPersistence } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -22,9 +22,10 @@ const firebaseConfig = {
   measurementId: "G-2TP12NM64G"
 };
 
-// Initialize Firebase
+// Initialize Firebase with auth persistence
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+auth.setPersistence(browserLocalPersistence);
 const firestore = getFirestore(app);
 
 // Debug Firebase initialization
