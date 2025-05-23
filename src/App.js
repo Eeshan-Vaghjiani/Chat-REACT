@@ -19,13 +19,14 @@ const firebaseConfig = {
   storageBucket: "superchat-7c5a6.firebasestorage.app",
   messagingSenderId: "812857147700",
   appId: "1:812857147700:web:96e4d09404ca3ed805a561",
-  measurementId: "G-2TP12NM64G"
+  measurementId: "G-2TP12NM64G",
+  databaseURL: "https://superchat-7c5a6.firebaseio.com"
 };
 
-// Initialize Firebase with auth persistence
+// Initialize Firebase with persistence
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-auth.setPersistence(browserLocalPersistence);
+await auth.setPersistence(browserLocalPersistence);
 const firestore = getFirestore(app);
 
 // Debug Firebase initialization
