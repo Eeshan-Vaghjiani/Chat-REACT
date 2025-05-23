@@ -2,6 +2,7 @@
   "name": "superchat",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://eeshan-vaghjiani.github.io/Chatt-REACT",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -24,8 +25,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build --no-history --dotfiles",
-    "clean": "rmdir /s /q build && rmdir /s /q node_modules"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +47,5 @@
   },
   "devDependencies": {
     "gh-pages": "^6.3.0"
-  },
-  "homepage": "https://eeshan-vaghjiani.github.io/Chatt-REACT"
+  }
 }
