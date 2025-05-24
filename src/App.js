@@ -1,15 +1,14 @@
 import React, { useRef, useState } from 'react';
 import './App.css';
+import EmojiPicker from 'emoji-picker-react';
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, browserLocalPersistence } from 'firebase/auth';
-import { getAnalytics } from 'firebase/analytics';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-// Import default avatar
 import defaultAvatar from './assets/image.png';
 
 const firebaseConfig = {
@@ -23,17 +22,20 @@ const firebaseConfig = {
   databaseURL: "https://superchat-7c5a6.firebaseio.com"
 };
 
-// Initialize Firebase with persistence
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-await auth.setPersistence(browserLocalPersistence);
 const firestore = getFirestore(app);
 
-// Debug Firebase initialization
-console.log('Firebase initialized with config:', {
-  projectId: firebaseConfig.projectId,
-  databaseURL: firebaseConfig.databaseURL
-});
+// Set persistence - wrap in async function
+const setPersistence = async () => {
+  try {
+    await auth.setPersistence(browserLocalPersistence);
+  } catch (error) {
+    console.error("Auth persistence error:", error);
+  }
+};
+setPersistence();
 
 function App() {
   const [user] = useAuthState(auth);
@@ -41,8 +43,8 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>⚡ SuperChat</h1>
-        {user && <SignOut />}
+        <h1>SuperChat</h1>
+        <SignOut />
       </header>
 
       <section>
@@ -53,72 +55,50 @@ function App() {
 }
 
 function SignIn() {
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
-  }
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      console.error("Sign in error:", error);
+    }
+  };
 
   return (
     <div className="sign-in-container">
-      <h2>SUPERCHAT</h2>
-      <p>Where Conversations Flow</p>
-      <button className="sign-in" onClick={signInWithGoogle}>
-        Sign in with Google
-      </button>
+      <h2>Welcome to SuperChat</h2>
+      <p>Join the conversation!</p>
+      <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
     </div>
-  )
+  );
 }
 
 function SignOut() {
-  return (
-    <button className="sign-out" onClick={() => signOut(auth)}>
-      Sign Out
-    </button>
-  )
+  return auth.currentUser && (
+    <button onClick={() => signOut(auth)}>Sign Out</button>
+  );
 }
 
 function ChatRoom() {
   const dummy = useRef();
-  const [error, setError] = useState('');
-  const [formValue, setFormValue] = useState('');
-  const [user] = useAuthState(auth);
-
   const messagesRef = collection(firestore, 'messages');
-  const q = query(
-    messagesRef,
-    orderBy('createdAt', 'desc'),
-    limit(50)  // Increased limit for better conversation context
-  );
-  
-  const [messages, loading, error2] = useCollectionData(q, { 
-    idField: 'id',
-    snapshotListenOptions: { includeMetadataChanges: true }
-  });
+  const q = query(messagesRef, orderBy('createdAt'), limit(25));
 
-  React.useEffect(() => {
-    if (messages && dummy.current) {
-      dummy.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages]);
+  const [messages] = useCollectionData(q, { idField: 'id' });
+  const [formValue, setFormValue] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [error, setError] = useState(null);
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    setError('');
 
-    if (!user) {
-      setError('You must be signed in to send messages');
-      return;
-    }
+    if (!formValue.trim()) return;
 
-    if (!formValue.trim()) {
-      return;
-    }
+    const { uid, photoURL, displayName } = auth.currentUser;
 
     try {
-      const { uid, photoURL, displayName } = user;
-      
       await addDoc(messagesRef, {
-        text: formValue.trim(),
+        text: formValue,
         createdAt: serverTimestamp(),
         uid,
         photoURL: photoURL || defaultAvatar,
@@ -127,61 +107,71 @@ function ChatRoom() {
 
       setFormValue('');
       dummy.current.scrollIntoView({ behavior: 'smooth' });
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setError('Failed to send message: ' + err.message);
+      setError(null);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setError("Failed to send message. Please try again.");
     }
-  }
+  };
 
-  if (loading) {
-    return <div className="loading">Loading messages...</div>;
-  }
+  const onEmojiClick = (emojiData) => {
+    setFormValue(prev => prev + emojiData.emoji);
+    setShowEmojiPicker(false);
+  };
 
-  if (error2) {
-    return <div className="error">Error loading messages: {error2.message}</div>;
-  }
+  return (
+    <>
+      <main>
+        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+        <span ref={dummy}></span>
+      </main>
 
-  return (<>
-    <main>
-      <span ref={dummy}></span>
-      {messages && messages.slice().reverse().map(msg => (
-        <ChatMessage key={msg.id} message={msg} />
-      ))}
-    </main>
-
-    <form onSubmit={sendMessage}>
-      <input 
-        value={formValue} 
-        onChange={(e) => setFormValue(e.target.value)} 
-        placeholder="Type your message here..."
-        maxLength={500}
-      />
-      <button type="submit" disabled={!formValue.trim()}>
-        Send
-      </button>
-    </form>
-    {error && <p className="error">{error}</p>}
-  </>)
+      <form onSubmit={sendMessage}>
+        <div className="input-container">
+          <button 
+            type="button" 
+            className="emoji-button"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          >
+            😊
+          </button>
+          {showEmojiPicker && (
+            <div className="emoji-picker-container">
+              <EmojiPicker
+                onEmojiClick={onEmojiClick}
+                autoFocusSearch={false}
+                width={300}
+                height={400}
+              />
+            </div>
+          )}
+          <input 
+            value={formValue} 
+            onChange={(e) => setFormValue(e.target.value)} 
+            placeholder="Type your message..."
+            maxLength={500}
+          />
+          <button type="submit" disabled={!formValue.trim()}>Send</button>
+        </div>
+      </form>
+      {error && <p className="error">{error}</p>}
+    </>
+  );
 }
 
 function ChatMessage(props) {
   const { text, uid, photoURL, displayName } = props.message;
-  const [user] = useAuthState(auth);
-  const messageClass = uid === user?.uid ? 'sent' : 'received';
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
 
   return (
     <div className={`message ${messageClass}`}>
-      <img 
-        src={photoURL || defaultAvatar} 
-        alt={displayName || 'User avatar'} 
-        title={displayName || 'Anonymous'}
-      />
+      <img src={photoURL || defaultAvatar} alt={displayName} />
       <div className="message-content">
-        {displayName && <span className="username">{displayName}</span>}
+        <span className="username">{displayName}</span>
         <p>{text}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export default App;

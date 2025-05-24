@@ -179,6 +179,35 @@ form {
   backdrop-filter: blur(10px);
 }
 
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.emoji-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.emoji-picker-container {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 8px;
+}
+
+form input {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
 input {
   flex: 1;
   padding: 1rem 1.5rem;
