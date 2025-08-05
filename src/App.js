@@ -146,13 +146,15 @@ function ChatRoom() {
         <span ref={dummy}></span>
       </main>
 
-      {replyTo && (
-        <div className="reply-preview">
-          <span>Replying to: </span>
-          <span className="reply-text">{replyTo.text}</span>
-          <button onClick={() => setReplyTo(null)}>Cancel</button>
-        </div>
-      )}
+      <div style={{ position: 'fixed', left: 0, right: 0, bottom: 80, zIndex: 100 }}>
+        {replyTo && (
+          <div className="reply-preview">
+            <span>Replying to: </span>
+            <span className="reply-text">{replyTo.text}</span>
+            <button onClick={() => setReplyTo(null)}>Cancel</button>
+          </div>
+        )}
+      </div>
 
       <form onSubmit={sendMessage}>
         <div className="input-container">
@@ -188,8 +190,13 @@ function ChatRoom() {
 
 // Helper to delete message
 async function firestoreDeleteMessage(id) {
-  const messageDoc = doc(firestore, 'messages', id);
-  await deleteDoc(messageDoc);
+  try {
+    const messageDoc = doc(firestore, 'messages', id);
+    await deleteDoc(messageDoc);
+  } catch (error) {
+    console.error('Delete failed:', error);
+    throw error;
+  }
 }
 
 // Helper to edit message
