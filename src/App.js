@@ -178,8 +178,8 @@ function ChatRoom() {
       {error && <p className="error">{error}</p>}
     </>
   );
+
 // Helper to delete message
-import { doc, deleteDoc } from 'firebase/firestore';
 async function firestoreDeleteMessage(id) {
   const messageDoc = doc(firestore, 'messages', id);
   await deleteDoc(messageDoc);
@@ -204,7 +204,7 @@ function ChatMessage(props) {
         )}
         <div style={{ position: 'relative' }}>
           <p>{text}</p>
-          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)}>
+          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)} title="Message actions">
             ⋮
           </button>
           {dropdownOpen && (
@@ -213,6 +213,9 @@ function ChatMessage(props) {
               <button onClick={() => { props.onReply(); setDropdownOpen(false); }}>Reply</button>
               {uid === auth.currentUser.uid && (
                 <button onClick={() => { props.onDelete(); setDropdownOpen(false); }}>Delete</button>
+              )}
+              {uid === auth.currentUser.uid && (
+                <button onClick={() => { /* TODO: Implement edit feature */ setDropdownOpen(false); }}>Edit</button>
               )}
             </div>
           )}
