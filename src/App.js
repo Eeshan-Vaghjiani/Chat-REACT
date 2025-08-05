@@ -127,20 +127,8 @@ function ChatRoom() {
             message={msg} 
             onReply={() => setReplyTo(msg)}
             onCopy={() => navigator.clipboard.writeText(msg.text)}
-            onDelete={async () => {
-              try {
-                await firestoreDeleteMessage(msg.id);
-              } catch (e) {
-                setError("Failed to delete message.");
-              }
-            }}
-            onEdit={async (newText) => {
-              try {
-                await firestoreEditMessage(msg.id, newText);
-              } catch (e) {
-                setError("Failed to edit message.");
-              }
-            }}
+            onDelete={async () => { await firestoreDeleteMessage(msg.id); }}
+            onEdit={async (newText) => { await firestoreEditMessage(msg.id, newText); }}
           />
         ))}
         <span ref={dummy}></span>
