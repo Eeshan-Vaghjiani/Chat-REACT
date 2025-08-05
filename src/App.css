@@ -1,3 +1,109 @@
+/* Dropdown menu for message actions */
+.dropdown-toggle {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--accent-color);
+  cursor: pointer;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.dropdown-toggle:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+.dropdown-menu {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  background: var(--background-light);
+  border: 1px solid var(--accent-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-menu button {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(56,189,248,0.08);
+  transition: background 0.2s;
+}
+.dropdown-menu button:last-child {
+  border-bottom: none;
+}
+.dropdown-menu button:hover {
+  background: rgba(56,189,248,0.12);
+  color: var(--primary-color);
+}
+
+/* Reply preview above input */
+.reply-preview {
+  background: var(--background-light);
+  border-left: 4px solid var(--accent-color);
+  padding: 10px 16px;
+  margin: 0 0 8px 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  box-shadow: 0 2px 8px rgba(56,189,248,0.08);
+}
+.reply-preview .reply-text {
+  color: var(--accent-color);
+  font-weight: 600;
+  margin-left: 4px;
+}
+.reply-preview button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  margin-left: auto;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.reply-preview button:hover {
+  background: var(--primary-color);
+}
+
+/* Replied message inside chat bubble */
+.reply-to {
+  background: rgba(56,189,248,0.08);
+  border-left: 3px solid var(--accent-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 0.9rem;
+  color: var(--accent-color);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.reply-to .reply-username {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+}
+.reply-to .reply-text {
+  color: var(--accent-color);
+  font-size: 0.95rem;
+}
 :root {
   --primary-color: #0EA5E9;
   --secondary-color: #0369A1;

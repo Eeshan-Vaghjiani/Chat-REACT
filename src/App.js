@@ -3,7 +3,7 @@ import './App.css';
 import EmojiPicker from 'emoji-picker-react';
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query } from 'firebase/firestore';
+import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query, doc, deleteDoc } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, browserLocalPersistence } from 'firebase/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -88,24 +88,23 @@ function ChatRoom() {
   const [formValue, setFormValue] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [error, setError] = useState(null);
+  const [replyTo, setReplyTo] = useState(null);
 
   const sendMessage = async (e) => {
     e.preventDefault();
-
     if (!formValue.trim()) return;
-
     const { uid, photoURL, displayName } = auth.currentUser;
-
     try {
       await addDoc(messagesRef, {
         text: formValue,
         createdAt: serverTimestamp(),
         uid,
         photoURL: photoURL || defaultAvatar,
-        displayName: displayName || 'Anonymous'
+        displayName: displayName || 'Anonymous',
+        replyTo: replyTo ? replyTo : null
       });
-
       setFormValue('');
+      setReplyTo(null);
       dummy.current.scrollIntoView({ behavior: 'smooth' });
       setError(null);
     } catch (error) {
@@ -122,9 +121,31 @@ function ChatRoom() {
   return (
     <>
       <main>
-        {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
+        {messages && messages.map(msg => (
+          <ChatMessage 
+            key={msg.id} 
+            message={msg} 
+            onReply={() => setReplyTo(msg)}
+            onCopy={() => navigator.clipboard.writeText(msg.text)}
+            onDelete={async () => {
+              try {
+                await firestoreDeleteMessage(msg.id);
+              } catch (e) {
+                setError("Failed to delete message.");
+              }
+            }}
+          />
+        ))}
         <span ref={dummy}></span>
       </main>
+
+      {replyTo && (
+        <div className="reply-preview">
+          <span>Replying to: </span>
+          <span className="reply-text">{replyTo.text}</span>
+          <button onClick={() => setReplyTo(null)}>Cancel</button>
+        </div>
+      )}
 
       <form onSubmit={sendMessage}>
         <div className="input-container">
@@ -157,18 +178,45 @@ function ChatRoom() {
       {error && <p className="error">{error}</p>}
     </>
   );
+// Helper to delete message
+import { doc, deleteDoc } from 'firebase/firestore';
+async function firestoreDeleteMessage(id) {
+  const messageDoc = doc(firestore, 'messages', id);
+  await deleteDoc(messageDoc);
+}
 }
 
 function ChatMessage(props) {
-  const { text, uid, photoURL, displayName } = props.message;
+  const { text, uid, photoURL, displayName, replyTo } = props.message;
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <div className={`message ${messageClass}`}>
       <img src={photoURL || defaultAvatar} alt={displayName} />
       <div className="message-content">
         <span className="username">{displayName}</span>
-        <p>{text}</p>
+        {replyTo && (
+          <div className="reply-to">
+            <span className="reply-username">{replyTo.displayName || 'Anonymous'}</span>
+            <span className="reply-text">{replyTo.text}</span>
+          </div>
+        )}
+        <div style={{ position: 'relative' }}>
+          <p>{text}</p>
+          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            ⋮
+          </button>
+          {dropdownOpen && (
+            <div className="dropdown-menu">
+              <button onClick={() => { props.onCopy(); setDropdownOpen(false); }}>Copy</button>
+              <button onClick={() => { props.onReply(); setDropdownOpen(false); }}>Reply</button>
+              {uid === auth.currentUser.uid && (
+                <button onClick={() => { props.onDelete(); setDropdownOpen(false); }}>Delete</button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
