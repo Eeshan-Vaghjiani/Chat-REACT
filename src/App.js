@@ -3,7 +3,7 @@ import './App.css';
 import EmojiPicker from 'emoji-picker-react';
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query, doc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, query, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, browserLocalPersistence } from 'firebase/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -134,6 +134,13 @@ function ChatRoom() {
                 setError("Failed to delete message.");
               }
             }}
+            onEdit={async (newText) => {
+              try {
+                await firestoreEditMessage(msg.id, newText);
+              } catch (e) {
+                setError("Failed to edit message.");
+              }
+            }}
           />
         ))}
         <span ref={dummy}></span>
@@ -184,15 +191,50 @@ async function firestoreDeleteMessage(id) {
   const messageDoc = doc(firestore, 'messages', id);
   await deleteDoc(messageDoc);
 }
+
+// Helper to edit message
+async function firestoreEditMessage(id, newText) {
+  try {
+    const messageDoc = doc(firestore, 'messages', id);
+    await updateDoc(messageDoc, { text: newText });
+  } catch (error) {
+    console.error('Edit failed:', error);
+    throw error;
+  }
+}
 }
 
 function ChatMessage(props) {
   const { text, uid, photoURL, displayName, replyTo } = props.message;
   const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(text);
+  const dropdownRef = useRef();
+  const [dropdownPosition, setDropdownPosition] = useState('bottom');
+
+  // Position dropdown above if not enough space below
+  const handleDropdownToggle = () => {
+    setDropdownOpen(!dropdownOpen);
+    if (!dropdownOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setDropdownPosition(spaceBelow < 150 ? 'top' : 'bottom');
+    }
+  };
+
+  // Edit message handler
+  const handleEdit = async () => {
+    try {
+      await props.onEdit(editValue);
+      setEditing(false);
+    } catch (e) {
+      alert('Failed to edit message');
+    }
+  };
 
   return (
-    <div className={`message ${messageClass}`}>
+    <div className={`message ${messageClass}`} ref={dropdownRef}>
       <img src={photoURL || defaultAvatar} alt={displayName} />
       <div className="message-content">
         <span className="username">{displayName}</span>
@@ -203,21 +245,29 @@ function ChatMessage(props) {
           </div>
         )}
         <div style={{ position: 'relative' }}>
-          <p>{text}</p>
-          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)} title="Message actions">
-            ⋮
-          </button>
-          {dropdownOpen && (
-            <div className="dropdown-menu">
-              <button onClick={() => { props.onCopy(); setDropdownOpen(false); }}>Copy</button>
-              <button onClick={() => { props.onReply(); setDropdownOpen(false); }}>Reply</button>
-              {uid === auth.currentUser.uid && (
-                <button onClick={() => { props.onDelete(); setDropdownOpen(false); }}>Delete</button>
-              )}
-              {uid === auth.currentUser.uid && (
-                <button onClick={() => { /* TODO: Implement edit feature */ setDropdownOpen(false); }}>Edit</button>
-              )}
+          {editing ? (
+            <div className="edit-message-box">
+              <input value={editValue} onChange={e => setEditValue(e.target.value)} maxLength={500} />
+              <button onClick={handleEdit}>Save</button>
+              <button onClick={() => setEditing(false)}>Cancel</button>
             </div>
+          ) : (
+            <>
+              <p>{text}</p>
+              <button className="dropdown-toggle" onClick={handleDropdownToggle} title="Message actions">⋮</button>
+              {dropdownOpen && (
+                <div className={`dropdown-menu dropdown-menu-${dropdownPosition}`}>
+                  <button onClick={() => { props.onCopy(); setDropdownOpen(false); }}>Copy</button>
+                  <button onClick={() => { props.onReply(); setDropdownOpen(false); }}>Reply</button>
+                  {uid === auth.currentUser.uid && (
+                    <button onClick={() => { props.onDelete(); setDropdownOpen(false); }}>Delete</button>
+                  )}
+                  {uid === auth.currentUser.uid && (
+                    <button onClick={() => { setEditing(true); setDropdownOpen(false); }}>Edit</button>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

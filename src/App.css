@@ -29,6 +29,8 @@
   display: flex;
   flex-direction: column;
 }
+.dropdown-menu-bottom { top: 32px; }
+.dropdown-menu-top { bottom: 32px; }
 .dropdown-menu button {
   background: none;
   border: none;
@@ -477,4 +479,32 @@ main::-webkit-scrollbar-thumb {
 
 main::-webkit-scrollbar-thumb:hover {
   background: var(--secondary-color);
+}
+
+.edit-message-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.edit-message-box input {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent-color);
+  font-size: 1rem;
+  background: var(--background-light);
+  color: var(--text-primary);
+}
+.edit-message-box button {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.edit-message-box button:hover {
+  background: var(--primary-color);
 }
