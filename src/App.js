@@ -7,7 +7,7 @@ import { getFirestore, collection, orderBy, limit, addDoc, serverTimestamp, quer
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, browserLocalPersistence } from 'firebase/auth';
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollection } from 'react-firebase-hooks/firestore';
 
 import defaultAvatar from './assets/image.png';
 
@@ -84,7 +84,10 @@ function ChatRoom() {
   const messagesRef = collection(firestore, 'messages');
   const q = query(messagesRef, orderBy('createdAt'), limit(500));
 
-  const [messages] = useCollectionData(q, { idField: 'id' });
+  // Replace useCollectionData with useCollection
+  const [snapshot] = useCollection(q);
+  const messages = snapshot?.docs.map(doc => ({ id: doc.id, ...doc.data() })) || [];
+  
   const [formValue, setFormValue] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [error, setError] = useState(null);
@@ -118,6 +121,7 @@ function ChatRoom() {
     setShowEmojiPicker(false);
   };
 
+  console.log('messages:', messages);
   return (
     <>
       <main>
@@ -207,6 +211,15 @@ function ChatMessage(props) {
   const [editValue, setEditValue] = useState(text);
   const dropdownRef = useRef();
   const [dropdownPosition, setDropdownPosition] = useState('bottom');
+  const editInputRef = useRef();
+
+  // Focus input when editing starts
+  React.useEffect(() => {
+    if (editing && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.setSelectionRange(editInputRef.current.value.length, editInputRef.current.value.length);
+    }
+  }, [editing]);
 
   // Position dropdown above if not enough space below
   const handleDropdownToggle = () => {
@@ -242,7 +255,18 @@ function ChatMessage(props) {
         <div style={{ position: 'relative' }}>
           {editing ? (
             <div className="edit-message-box">
-              <input value={editValue} onChange={e => setEditValue(e.target.value)} maxLength={500} />
+              <input
+                ref={editInputRef}
+                value={editValue}
+                onChange={e => setEditValue(e.target.value)}
+                maxLength={500}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleEdit();
+                  }
+                }}
+              />
               <button onClick={handleEdit}>Save</button>
               <button onClick={() => setEditing(false)}>Cancel</button>
             </div>
