@@ -2,7 +2,7 @@
   "name": "superchat",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dhruvinbhudia.me/Chat-REACT",
+  "homepage": "https://dhruvinbhudia.me/",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
