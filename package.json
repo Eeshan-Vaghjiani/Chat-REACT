@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "gh-pages": "^6.3.0",
-    "postcss-safe-parser": "^6.0.0"
+    "postcss-safe-parser": "^7.0.1"
   },
   "resolutions": {
     "postcss": "^8.4.31",
