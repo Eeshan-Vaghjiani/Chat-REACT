@@ -160,7 +160,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Eeshan Vaghjiani - [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white)](https://www.instagram.com/eeshan.04?igsh=MXI0NnBtY3VyeWp5aw%3D%3D&utm_source=qr)
 
-Project Link: [https://github.com/Eeshan-Vaghjiani/Chatt-REACT](https://github.com/Eeshan-Vaghjiani/Chatt-REACT)
+Project Link: [https://eeshan-vaghjiani.github.io/Chat-REACT/](https://eeshan-vaghjiani.github.io/Chat-REACT/)
 
 ---
 
