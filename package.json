@@ -12,7 +12,7 @@
     "firebase": "^12.15.0",
     "http-proxy-middleware": "^4.1.1",
     "nth-check": "^2.1.1",
-    "postcss": "^8.5.15",
+    "postcss": "^8.5.18",
     "react": "^19.2.4",
     "react-dom": "^19.2.7",
     "react-firebase-hooks": "^5.1.1",
